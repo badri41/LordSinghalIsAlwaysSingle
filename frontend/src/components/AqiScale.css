@@ -1,0 +1,94 @@
+.aqi-scale-container {
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  animation: fadeIn 0.5s ease 0.1s both;
+}
+
+.aqi-scale-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.aqi-scale-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  overflow: visible;
+  display: flex;
+}
+
+.aqi-scale-segment {
+  height: 100%;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+.aqi-scale-segment:first-child {
+  border-radius: 7px 0 0 7px;
+}
+.aqi-scale-segment:last-child {
+  border-radius: 0 7px 7px 0;
+}
+.aqi-scale-segment:hover {
+  transform: scaleY(1.4);
+  z-index: 2;
+}
+
+.aqi-scale-labels {
+  display: flex;
+  margin-top: 8px;
+}
+
+.aqi-scale-label {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.aqi-scale-label .label-name {
+  display: block;
+  font-weight: 600;
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+
+.aqi-scale-label .label-range {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.aqi-marker {
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg) translateX(-50%);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+  animation: glow 2s ease-in-out infinite;
+}
+
+.aqi-marker-value {
+  position: absolute;
+  top: -34px;
+  transform: translateX(-50%);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}

@@ -1,0 +1,111 @@
+.daynight-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  animation: fadeIn 0.5s ease 0.3s both;
+}
+
+.daynight-card {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+}
+
+.daynight-card.day {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #06b6d4 100%);
+}
+
+.daynight-card.night {
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f4c75 50%, #06b6d4 100%);
+}
+
+.daynight-card-label {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: white;
+}
+
+.daynight-card-icon {
+  position: absolute;
+  top: 8px;
+  right: 50px;
+  font-size: 4rem;
+  opacity: 0.15;
+  color: white;
+}
+
+.daynight-card .card-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  gap: 12px;
+}
+
+.daynight-stat {
+  flex: 1;
+}
+
+.daynight-stat-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.daynight-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.daynight-time {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.daynight-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+}
+
+.daynight-badge.high {
+  background: rgba(233, 63, 51, 0.85);
+}
+
+.daynight-badge.low {
+  background: rgba(34, 197, 94, 0.85);
+}
+
+.daynight-date {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.6);
+}
+
+@media (max-width: 768px) {
+  .daynight-cards {
+    grid-template-columns: 1fr;
+  }
+}
