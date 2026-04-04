@@ -3,7 +3,7 @@ USE aqi_db;
 
 CREATE TABLE cities (
     city_id INT AUTO_INCREMENT PRIMARY KEY,
-    city VARCHAR(50) UNIQUE,
+    city_name VARCHAR(50) UNIQUE,
     state VARCHAR(50),
     region VARCHAR(50)
 );
@@ -11,7 +11,7 @@ CREATE TABLE cities (
 CREATE TABLE aqi_data (
     id INT AUTO_INCREMENT PRIMARY KEY,   -- temporary PK
     city_id INT,
-    city VARCHAR(50),                    -- temporary (for CSV load)
+    city_name VARCHAR(50),                    -- temporary (for CSV load)
     date DATE,
     co FLOAT,
     no2 FLOAT,

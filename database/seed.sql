@@ -21,19 +21,18 @@ LOAD DATA LOCAL INFILE 'data/csv/merged/merged_aqi_data_2021_2026.csv'
 INTO TABLE aqi_data
 FIELDS TERMINATED BY ','
 IGNORE 1 ROWS
-(city, date, co, no2, o3, pm10, pm25, aqi_daily, @aqi_monthly);
+(city_name, date, co, no2, o3, pm10, pm25, aqi_daily, @aqi_monthly);
 
 UPDATE aqi_data a
 JOIN cities c
 ON LOWER(TRIM(a.city_name)) = LOWER(TRIM(c.city_name))
 SET a.city_id = c.city_id;
 
-ALTER TABLE aqi_data DROP COLUMN city;
-
+ALTER TABLE aqi_data DROP COLUMN city_name;
+ALTER TABLE aqi_data MODIFY id INT;  -- remove AUTO_INCREMENT
 ALTER TABLE aqi_data DROP PRIMARY KEY;
 
 ALTER TABLE aqi_data DROP COLUMN id;
-
 ALTER TABLE aqi_data
 ADD PRIMARY KEY (city_id, date);
 
