@@ -167,6 +167,16 @@
   font-weight: 500;
 }
 
+.stats-overview-empty {
+  margin: 14px 0 24px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
 @media (max-width: 768px) {
   .overview-summary {
     grid-template-columns: 1fr;

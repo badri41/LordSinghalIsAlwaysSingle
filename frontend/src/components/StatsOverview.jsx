@@ -1,12 +1,55 @@
+import { useEffect, useMemo, useState } from 'react';
 import { FiMapPin, FiWind, FiTrendingDown } from 'react-icons/fi';
-import { getOverviewStats, getAqiCategory } from '../data/mockData';
+import { getAqiCategory } from '../data/mockData';
+import { fetchOverviewStats } from '../services/api';
 import './StatsOverview.css';
 
 export default function StatsOverview({ onSelectCity }) {
-  const stats = getOverviewStats();
-  const avgAqi = Math.round(stats.reduce((s, c) => s + c.currentAqi, 0) / stats.length);
-  const worst = stats.reduce((a, b) => a.currentAqi > b.currentAqi ? a : b);
-  const best = stats.reduce((a, b) => a.currentAqi < b.currentAqi ? a : b);
+  const [stats, setStats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadOverview() {
+      try {
+        setIsLoading(true);
+        setError('');
+        const response = await fetchOverviewStats();
+        if (!ignore) {
+          setStats(response);
+        }
+      } catch (loadError) {
+        if (!ignore) {
+          setError(loadError.message || 'Failed to load overview data.');
+          setStats([]);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadOverview();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const { avgAqi, worst, best } = useMemo(() => {
+    if (stats.length === 0) {
+      return { avgAqi: 0, worst: null, best: null };
+    }
+
+    return {
+      avgAqi: Math.round(stats.reduce((sum, city) => sum + city.currentAqi, 0) / stats.length),
+      worst: stats.reduce((prev, current) => (prev.currentAqi > current.currentAqi ? prev : current)),
+      best: stats.reduce((prev, current) => (prev.currentAqi < current.currentAqi ? prev : current)),
+    };
+  }, [stats]);
 
   function getAqiClass(aqi) {
     if (aqi <= 50) return 'aqi-good';
@@ -17,13 +60,31 @@ export default function StatsOverview({ onSelectCity }) {
     return 'aqi-hazardous';
   }
 
+  if (isLoading) {
+    return (
+      <div className="stats-overview-empty">Loading overview data...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="stats-overview-empty">{error}</div>
+    );
+  }
+
+  if (stats.length === 0 || !worst || !best) {
+    return (
+      <div className="stats-overview-empty">No overview data available.</div>
+    );
+  }
+
   return (
     <>
       <div className="overview-summary">
         <div className="overview-summary-card gradient-1">
           <div className="overview-summary-icon"><FiWind /></div>
           <div className="overview-summary-value">{avgAqi}</div>
-          <div className="overview-summary-label">Avg AQI Across 8 Cities</div>
+          <div className="overview-summary-label">Avg AQI Across {stats.length} Cities</div>
         </div>
         <div className="overview-summary-card gradient-2">
           <div className="overview-summary-icon"><FiTrendingDown style={{ transform: 'rotate(180deg)' }} /></div>

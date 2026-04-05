@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -7,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { getHistoricalMonthly } from '../data/mockData';
+import { fetchHistoricalAqi } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import './HistoricalChart.css';
 
@@ -25,6 +26,45 @@ const yearColors = {
 export default function HistoricalChart({ locationId, month, metric = 'aqi', locationName }) {
   const { theme } = useTheme();
   const isLight = theme === 'light';
+  const [historical, setHistorical] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadHistorical() {
+      if (!locationId) {
+        setHistorical([]);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError('');
+
+        const response = await fetchHistoricalAqi({ cityId: locationId, month });
+        if (!ignore) {
+          setHistorical(response);
+        }
+      } catch (loadError) {
+        if (!ignore) {
+          setHistorical([]);
+          setError(loadError.message || 'Failed to load historical data.');
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadHistorical();
+
+    return () => {
+      ignore = true;
+    };
+  }, [locationId, month]);
 
   const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
   const tickColor = isLight ? '#4b5563' : '#6b7280';
@@ -33,9 +73,44 @@ export default function HistoricalChart({ locationId, month, metric = 'aqi', loc
   const tooltipBody = isLight ? '#4b5563' : '#9aa0b0';
   const legendColor = isLight ? '#4b5563' : '#9aa0b0';
 
-  const historical = getHistoricalMonthly(locationId, month);
   const metricLabel = metric === 'aqi' ? 'AQI' : metric === 'pm25' ? 'PM2.5' : 'PM10';
   const metricKey = metric === 'aqi' ? 'avgAqi' : metric === 'pm25' ? 'avgPm25' : 'avgPm10';
+
+  if (isLoading) {
+    return (
+      <div className="historical-chart">
+        <div className="historical-header">
+          <div className="historical-title">{months[month]} Air Quality Analysis</div>
+          <div className="historical-subtitle">{locationName || 'All Regions'}, India</div>
+        </div>
+        <div className="historical-empty">Loading historical data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="historical-chart">
+        <div className="historical-header">
+          <div className="historical-title">{months[month]} Air Quality Analysis</div>
+          <div className="historical-subtitle">{locationName || 'All Regions'}, India</div>
+        </div>
+        <div className="historical-empty">{error}</div>
+      </div>
+    );
+  }
+
+  if (historical.length === 0) {
+    return (
+      <div className="historical-chart">
+        <div className="historical-header">
+          <div className="historical-title">{months[month]} Air Quality Analysis</div>
+          <div className="historical-subtitle">{locationName || 'All Regions'}, India</div>
+        </div>
+        <div className="historical-empty">No historical data available.</div>
+      </div>
+    );
+  }
 
   const data = {
     labels: historical.map(h => h.year.toString()),

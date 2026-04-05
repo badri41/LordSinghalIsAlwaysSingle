@@ -1,10 +1,9 @@
-import { locations } from '../data/mockData';
 import './FilterBar.css';
 
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const years = [2022, 2023, 2024, 2025, 2026];
 
-export default function FilterBar({ selectedLocation, onLocationChange, selectedMonth, onMonthChange, selectedYear, onYearChange, granularity, onGranularityChange }) {
+export default function FilterBar({ locations = [], selectedLocation, onLocationChange, selectedMonth, onMonthChange, selectedYear, onYearChange, granularity, onGranularityChange }) {
   const maxMonth = selectedYear === 2026 ? 2 : 11;
 
   return (
@@ -18,7 +17,7 @@ export default function FilterBar({ selectedLocation, onLocationChange, selected
         >
           <option value="">All Regions</option>
           {locations.map(loc => (
-            <option key={loc.id} value={loc.id}>
+            <option key={loc.id} value={String(loc.id)}>
               {loc.name}, {loc.state}
             </option>
           ))}

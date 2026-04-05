@@ -28,6 +28,17 @@
   position: relative;
 }
 
+.historical-empty {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+}
+
 @media (max-width: 768px) {
   .historical-chart {
     padding: 16px;

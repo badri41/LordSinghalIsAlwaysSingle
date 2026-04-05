@@ -28,6 +28,22 @@
   line-height: 1.5;
 }
 
+.app-data-error {
+  margin: 8px 0 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(233, 63, 51, 0.35);
+  background: rgba(233, 63, 51, 0.12);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.city-loading {
+  margin: 8px 0 18px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
 /* Chart + Day/Night grid */
 .chart-daynight-grid {
   display: grid;

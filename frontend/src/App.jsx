@@ -1,28 +1,52 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from './components/Header';
 import FilterBar from './components/FilterBar';
 import MetricTabs from './components/MetricTabs';
 import AqiScale from './components/AqiScale';
-import AqiLineChart from './components/AqiLineChart';
-import DayNightCards from './components/DayNightCards';
 import TrendChart from './components/TrendChart';
 import HistoricalChart from './components/HistoricalChart';
-import SummaryPanel from './components/SummaryPanel';
 import StatsOverview from './components/StatsOverview';
-import { locations, getDailyData, aggregateWeekly, aggregateMonthly } from './data/mockData';
+import { fetchCities, fetchDailyAqi } from './services/api';
+import { aggregateWeekly, aggregateMonthly } from './utils/dataTransforms';
 import './App.css';
 
 export default function App() {
+  const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(2); // March
   const [selectedYear, setSelectedYear] = useState(2026);
   const [granularity, setGranularity] = useState('daily');
   const [activeMetric, setActiveMetric] = useState('aqi');
+  const [dailyData, setDailyData] = useState([]);
+  const [isDailyLoading, setIsDailyLoading] = useState(false);
+  const [dataError, setDataError] = useState('');
 
-  const location = useMemo(
-    () => locations.find(l => l.id === selectedLocation),
-    [selectedLocation]
-  );
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadCities() {
+      try {
+        const cities = await fetchCities();
+        if (!ignore) {
+          setLocations(cities);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setDataError(error.message || 'Failed to load cities.');
+        }
+      }
+    }
+
+    loadCities();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const location = useMemo(() => (
+    locations.find(l => String(l.id) === String(selectedLocation))
+  ), [locations, selectedLocation]);
 
   // Build the date range for selected month/year
   const dateRange = useMemo(() => {
@@ -34,10 +58,45 @@ export default function App() {
     return { start, end };
   }, [selectedMonth, selectedYear]);
 
-  // Get data for current selection
-  const dailyData = useMemo(() => {
-    if (!selectedLocation) return [];
-    return getDailyData(selectedLocation, dateRange.start, dateRange.end);
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadDailyData() {
+      if (!selectedLocation) {
+        setDailyData([]);
+        return;
+      }
+
+      try {
+        setIsDailyLoading(true);
+        setDataError('');
+
+        const response = await fetchDailyAqi({
+          cityId: selectedLocation,
+          startDate: dateRange.start,
+          endDate: dateRange.end,
+        });
+
+        if (!ignore) {
+          setDailyData(response);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setDailyData([]);
+          setDataError(error.message || 'Failed to load AQI data.');
+        }
+      } finally {
+        if (!ignore) {
+          setIsDailyLoading(false);
+        }
+      }
+    }
+
+    loadDailyData();
+
+    return () => {
+      ignore = true;
+    };
   }, [selectedLocation, dateRange]);
 
   const aggregatedData = useMemo(() => {
@@ -46,17 +105,12 @@ export default function App() {
     return dailyData;
   }, [dailyData, granularity]);
 
-  // Latest day data for 24-hour chart
-  const latestDayData = useMemo(() => {
-    if (dailyData.length === 0) return null;
-    return dailyData[dailyData.length - 1];
-  }, [dailyData]);
-
-  // Current AQI for scale
-  const currentAqi = latestDayData?.daily?.avgAqi || 0;
+  const currentAqi = dailyData.length > 0
+    ? dailyData[dailyData.length - 1].daily.avgAqi
+    : 0;
 
   function handleSelectCity(cityId) {
-    setSelectedLocation(cityId);
+    setSelectedLocation(String(cityId));
   }
 
   function handleYearChange(year) {
@@ -72,6 +126,7 @@ export default function App() {
       <Header location={location} />
       <main className="app-content">
         <FilterBar
+          locations={locations}
           selectedLocation={selectedLocation}
           onLocationChange={setSelectedLocation}
           selectedMonth={selectedMonth}
@@ -81,6 +136,8 @@ export default function App() {
           granularity={granularity}
           onGranularityChange={setGranularity}
         />
+
+        {dataError && <p className="app-data-error">{dataError}</p>}
 
         {!selectedLocation ? (
           /* Landing: Overview of all regions */
@@ -102,17 +159,7 @@ export default function App() {
 
             <MetricTabs activeMetric={activeMetric} onMetricChange={setActiveMetric} />
 
-            {/* 24-hour chart + Day/Night cards */}
-            <div className="chart-daynight-grid">
-              <div className="chart-col">
-                <AqiLineChart dayData={latestDayData} metric={activeMetric} />
-              </div>
-              <div className="cards-col">
-                <DayNightCards dayData={latestDayData} />
-              </div>
-            </div>
-
-            <SummaryPanel dayData={latestDayData} cityName={location?.name} />
+            {isDailyLoading && <p className="city-loading">Loading city data...</p>}
 
             {/* Trend chart based on granularity */}
             <TrendChart
