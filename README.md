@@ -39,7 +39,7 @@ The system uses historical data and focuses on visualization and analytical insi
 
 ### Database
 
-* MySQL for structured storage
+* MariaDB for structured storage
 * Optimized queries for efficient data retrieval
 
 ---
@@ -82,38 +82,55 @@ Delhi, Mumbai, Kolkata, Chennai, Bengaluru, Hyderabad, Ahmedabad, Pune, Jaipur, 
 
 ---
 
-## 🗄️ 7. Database Setup
+## 🗄️ 7. Database Setup (MariaDB)
 
 ### Prerequisites
 
-* MySQL Server installed
+* MariaDB Server installed
 * CSV files available in `/data` folder
 
 ---
 
-### Option 1: Command Line (Recommended)
+### Step 1: Open Command Prompt and navigate to project
 
 cd project-root
 
-mysql -u root -p < database/schema.sql
-mysql -u root -p --local-infile=1 < database/seed.sql
+---
+
+### Step 2: Start MariaDB Client
+
+Run the following command:
+
+"C:\Program Files\MariaDB 12.2\bin\mysql.exe" -u root -p
+
+Enter your password when prompted.
 
 ---
 
-### Option 2: MySQL Workbench
+### Step 3: Enable local infile (Required for CSV loading)
 
-1. Run `schema.sql` to create tables
-2. Open `seed.sql`
-3. Update CSV file paths if required
-4. Execute the script OR use Table Import Wizard
+Inside MariaDB terminal:
+
+SET GLOBAL local_infile = 1;
+
+---
+
+### Step 4: Run Schema File
+
+SOURCE database/schema.sql;
+
+---
+
+### Step 5: Run Seed File
+
+SOURCE database/seed.sql;
 
 ---
 
 ### Notes
 
-* Ensure `local_infile` is enabled in MySQL
-* CSV paths should be correctly referenced
-* Use `LOAD DATA INFILE` for efficient bulk insertion
+* Ensure CSV paths in `seed.sql` are correct (relative to project root)
+* `local_infile` must be enabled for `LOAD DATA LOCAL INFILE` to work
+* Use forward slashes `/` in file paths if facing issues on Windows
 
 ---
-
