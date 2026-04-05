@@ -17,7 +17,7 @@ INSERT INTO cities (city_name, state, region) VALUES
 ('Noida', 'Uttar Pradesh', 'North'),
 ('Guwahati', 'Assam', 'Northeast');
 
-LOAD DATA LOCAL INFILE 'data/csv/merged/merged_aqi_data_2021_2026.csv'
+LOAD DATA LOCAL INFILE 'data/csv/merged/final_merged_aqi_data.csv'
 INTO TABLE aqi_data
 FIELDS TERMINATED BY ','
 IGNORE 1 ROWS
